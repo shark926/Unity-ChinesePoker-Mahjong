@@ -342,7 +342,7 @@ public class AssetBunldeManager
                 return "Windows";
             case BuildTarget.StandaloneOSXIntel:
             case BuildTarget.StandaloneOSXIntel64:
-            case BuildTarget.StandaloneOSXUniversal:
+            case BuildTarget.StandaloneOSX:
                 return "OSX";
             default:
                 return null;
