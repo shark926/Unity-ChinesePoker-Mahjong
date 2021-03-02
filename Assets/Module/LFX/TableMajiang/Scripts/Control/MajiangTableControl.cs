@@ -9,12 +9,12 @@ namespace Mahjong
     /// <summary>
     /// 桌面控制
     /// </summary>
-    public class MajiangTableControl
+    public class Control
     {
         #region 变量
 
         //桌面
-        private MajiangTable _majiangTable;
+        private TableUI _majiangTable;
 
         //桌面牌数据
         private List<CardInfo> tCards = new List<CardInfo>();
@@ -48,9 +48,9 @@ namespace Mahjong
 
         #endregion 变量
 
-        public MajiangTableControl()
+        public Control()
         {
-            _majiangTable = new MajiangTable();
+            _majiangTable = new TableUI();
 
             //生成玩家索引
             startIndex = MyUtil.GetRange(0, 4);
@@ -276,7 +276,7 @@ namespace Mahjong
             if (index % 4 == 0)
                 return;
 
-            var card = MajiangAI.AIPlayCard(players[index].myCards);
+            var card = AI.AIPlayCard(players[index].myCards);
             _playerPlay(card.cardIndex, card.cardName, false);
         }
 
@@ -393,9 +393,9 @@ namespace Mahjong
             //检测其他三个玩家的碰、杠
             for (int i = index + 1; i < index + 4; i++)
             {
-                result = MajiangRules.IsPeng(players[i % 4].myCards, pCard);
+                result = Rules.IsPeng(players[i % 4].myCards, pCard);
                 if (result == -1)
-                    result = MajiangRules.IsGang(players[i % 4].myCards, pCard);
+                    result = Rules.IsGang(players[i % 4].myCards, pCard);
                 if (result != -1)
                 {
                     index = i % 4;
@@ -501,7 +501,7 @@ namespace Mahjong
         private bool _checkHu(List<CardInfo> list, CardInfo mCardInfo, int win)
         {
             bool canHu = false;
-            if (MajiangRules.IsCanHU(list, mCardInfo))
+            if (Rules.IsCanHU(list, mCardInfo))
             {
                 canHu = true;
                 winIndex = win;

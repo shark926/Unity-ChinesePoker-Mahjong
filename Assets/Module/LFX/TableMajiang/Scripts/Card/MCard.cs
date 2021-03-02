@@ -51,7 +51,7 @@ namespace Mahjong
         #endregion 定义变量
 
         //点击事件
-        public Action<string> SetSelectEvent;
+        private Action<string> SetSelectEvent;
 
         public void AddSetSelectEvent(Action<string> action)
         {

@@ -5,7 +5,7 @@ namespace Mahjong
     /// <summary>
     /// 电脑AI出牌
     /// </summary>
-    public class MajiangAI
+    public class AI
     {
         public static CardInfo AIPlayCard(List<CardInfo> list)
         {

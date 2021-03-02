@@ -5,7 +5,7 @@ namespace Mahjong
     /// <summary>
     /// 麻将胡牌的判断
     /// </summary>
-    public class MajiangRules
+    public class Rules
     {
         /// <summary>
         /// 碰判断

@@ -7,7 +7,7 @@ using WT.UI;
 
 namespace Mahjong
 {
-    public class MajiangTable : WTUIPage
+    public class TableUI : WTUIPage
     {
         #region 变量
 
@@ -37,7 +37,7 @@ namespace Mahjong
 
         #endregion 变量
 
-        public MajiangTable() : base(UIType.Normal, UIMode.DoNothing, UICollider.None)
+        public TableUI() : base(UIType.Normal, UIMode.DoNothing, UICollider.None)
         {
             uiIndex = R.Prefab.MAJIANGTABLE;
         }
