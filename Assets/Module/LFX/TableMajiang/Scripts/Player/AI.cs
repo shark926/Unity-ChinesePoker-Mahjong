@@ -7,9 +7,9 @@ namespace Mahjong
     /// </summary>
     public class AI
     {
-        public static CardInfo AIPlayCard(List<CardInfo> list)
+        public static CardInfo PlayCard(List<CardInfo> list)
         {
-            var x = _findDropCard(list);
+            var x = FindDropCard(list);
 
             for (int i = 0; i < list.Count; i++)
             {
@@ -27,7 +27,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private static int _findDropCard(List<CardInfo> list)
+        private static int FindDropCard(List<CardInfo> list)
         {
             int index = -1;
             List<int> cards = new List<int>();

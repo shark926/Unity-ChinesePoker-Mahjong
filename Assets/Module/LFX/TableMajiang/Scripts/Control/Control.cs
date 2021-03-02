@@ -276,7 +276,7 @@ namespace Mahjong
             if (index % 4 == 0)
                 return;
 
-            var card = AI.AIPlayCard(players[index].myCards);
+            var card = AI.PlayCard(players[index].myCards);
             _playerPlay(card.cardIndex, card.cardName, false);
         }
 
