@@ -1,30 +1,34 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Collections.Generic;
 
-/// <summary>
-/// 桌上玩家类
-/// </summary>
-public class MBasePlayer
+namespace Mahjong
 {
-    //玩家手牌
-    private List<MCardInfo> _myCards = new List<MCardInfo>();
-    public List<MCardInfo> myCards
-    {
-        get { return _myCards; }
-        set { _myCards = value; }
-    }
-
     /// <summary>
-    /// 添加麻将到玩家的myCards列表中
+    /// 桌上玩家类
     /// </summary>
-    /// <param name="mCardInfo"></param>
-    public void AddCard(MCardInfo mCardInfo)
+    public class Player
     {
-        _myCards.Add(mCardInfo);
+        //玩家手牌
+        private List<CardInfo> _myCards = new List<CardInfo>();
+
+        public List<CardInfo> myCards
+        {
+            get
+            {
+                return _myCards;
+            }
+            set
+            {
+                _myCards = value;
+            }
+        }
+
+        /// <summary>
+        /// 添加麻将到玩家的myCards列表中
+        /// </summary>
+        /// <param name="mCardInfo"></param>
+        public void AddCard(CardInfo mCardInfo)
+        {
+            _myCards.Add(mCardInfo);
+        }
     }
-
-
 }

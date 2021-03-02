@@ -12,7 +12,7 @@ public class PokeMainCanvas : BaseCanvas, IHandlerReceive
     //斗地主桌界面
     private PokerTableControl pokerTableControl;
     //麻将卓界面
-    private MajiangTableControl majiangTableControl;
+    private Mahjong.MajiangTableControl majiangTableControl;
     //快速开始界面
     private PokerFastRoomControl pokerFastRoomControl;
     //设置界面
@@ -41,7 +41,7 @@ public class PokeMainCanvas : BaseCanvas, IHandlerReceive
         //斗地主桌面控制器
         pokerTableControl = new PokerTableControl();
         //麻将桌控制器
-        majiangTableControl = new MajiangTableControl();
+        majiangTableControl = new Mahjong.MajiangTableControl();
         //快速开始界面控制器
         pokerFastRoomControl = new PokerFastRoomControl();
         //设置界面控制器
