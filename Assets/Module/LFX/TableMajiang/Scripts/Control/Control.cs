@@ -212,7 +212,7 @@ namespace Mahjong
             //庄家先摸牌
             _drawMajiang();
             //摸牌后检测胡牌
-            if (_checkHu(players[index].myCards, null, index))
+            if (_checkHu(CurPlayerCards, null, index))
                 return;
 
             isSend = false;
@@ -251,7 +251,7 @@ namespace Mahjong
             players[index].AddCard(tCards[0]);
             var moCard = tCards[0];
             _majiangTable.DrawMajiangAnimation(tCards[0], index);
-            _sortCards(players[index].myCards);
+            _sortCards(CurPlayerCards);
             tCards.RemoveAt(0);
         }
 
@@ -276,7 +276,7 @@ namespace Mahjong
             if (index % 4 == 0)
                 return;
 
-            var card = AI.PlayCard(players[index].myCards);
+            var card = AI.PlayCard(CurPlayerCards);
             _playerPlay(card.cardIndex, card.cardName, false);
         }
 
@@ -295,6 +295,13 @@ namespace Mahjong
             _playerPlay(cardIndex, cardName, go);
         }
 
+        private List<CardInfo> CurPlayerCards
+        {
+            get
+            {
+                return players[index].myCards;
+            }
+        }
         /// <summary>
         /// 玩家出麻将
         /// </summary>
@@ -312,22 +319,22 @@ namespace Mahjong
             //当前玩家的出牌
             Debug.Log("Player " + index + " 出 " + cardIndex);
             int n = 0;
-            for (int i = 0; i < players[index].myCards.Count; i++)
+            for (int i = 0; i < CurPlayerCards.Count; i++)
             {
-                if (players[index].myCards[i].cardName == cardName)
+                if (CurPlayerCards[i].cardName == cardName)
                 {
                     n = i;
                     break;
                 }
             }
-            _majiangTable.PlayMajiangAnimation(cardName, players[index].myCards, index);
+            _majiangTable.PlayMajiangAnimation(cardName, CurPlayerCards, index);
             //保存这个玩家出的牌
-            pCard = players[index].myCards[n];
+            pCard = CurPlayerCards[n];
             //清除
-            players[index].myCards.RemoveAt(n);
+            CurPlayerCards.RemoveAt(n);
             //当前玩家重新排序
-            _sortCards(players[index].myCards);
-            _majiangTable.ShowMajiang(players[index].myCards, index);
+            _sortCards(CurPlayerCards);
+            _majiangTable.ShowMajiang(CurPlayerCards, index);
 
             //当前玩家出牌后，其他三个玩家进行检测胡、碰、杠操作
             _checkMajiang();
@@ -352,7 +359,7 @@ namespace Mahjong
             index = index % 4;
             _drawMajiang();
 
-            if (_checkHu(players[index].myCards, null, index))
+            if (_checkHu(CurPlayerCards, null, index))
                 return;
 
             //电脑出牌
@@ -401,11 +408,11 @@ namespace Mahjong
                     index = i % 4;
                     //有玩家碰、杠了
                     temp.Clear();
-                    for (int j = 0; j < players[index].myCards.Count; j++)
+                    for (int j = 0; j < CurPlayerCards.Count; j++)
                     {
-                        if (players[index].myCards[j].cardIndex == result)
+                        if (CurPlayerCards[j].cardIndex == result)
                         {
-                            temp.Add(players[index].myCards[j]);
+                            temp.Add(CurPlayerCards[j]);
                         }
                     }
                     temp.Add(pCard);
@@ -449,9 +456,9 @@ namespace Mahjong
             Debug.Log("Player " + index.ToString() + " 碰!");
 
             for (int i = 0; i < list.Count; i++)
-                players[index].myCards.Remove(list[i]);
+                CurPlayerCards.Remove(list[i]);
 
-            _majiangTable.ShowMajiang(players[index].myCards, index);
+            _majiangTable.ShowMajiang(CurPlayerCards, index);
             _majiangTable.ShowPengMajiang(list, index);
 
             //yield return new WaitForSeconds(1f);
@@ -474,14 +481,14 @@ namespace Mahjong
             Debug.Log("Player " + index.ToString() + " 杠!");
 
             for (int i = 0; i < list.Count; i++)
-                players[index].myCards.Remove(list[i]);
+                CurPlayerCards.Remove(list[i]);
 
-            _majiangTable.ShowMajiang(players[index].myCards, index);
+            _majiangTable.ShowMajiang(CurPlayerCards, index);
             _majiangTable.ShowPengMajiang(list, index);
 
             //杠完再摸一张、检测、再出
             _drawMajiang();
-            if (_checkHu(players[index].myCards, null, index))
+            if (_checkHu(CurPlayerCards, null, index))
                 return;
 
             //yield return new WaitForSeconds(1f);
