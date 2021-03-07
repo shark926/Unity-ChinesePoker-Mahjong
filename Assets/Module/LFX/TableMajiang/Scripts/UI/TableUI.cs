@@ -147,7 +147,7 @@ namespace Mahjong
                 c.SetCardIndex(list[i].CardIndex);
                 list[i].UserData = c;
                 //绑定麻将点击事件
-                c.AddSetSelectEvent(_clickMajiang);
+                c.AddSetSelectEvent(ClickMajiang);
             }
         }
 
@@ -159,7 +159,7 @@ namespace Mahjong
         /// <returns></returns>
         public void SendMajiangAnimation(List<Player> players)
         {
-            UnitTool.ToolStartCoroutine(SendMajiangCoroutine(players));
+            UnitTool.ToolStartCoroutine(SendCardCoroutine(players));
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Mahjong
         /// 麻将点击事件
         /// </summary>
         /// <param name="card"></param>
-        private void _clickMajiang(MCard card)
+        private void ClickMajiang(MCard card)
         {
             if (playerClickEvent != null)
             {

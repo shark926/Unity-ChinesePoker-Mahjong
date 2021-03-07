@@ -239,7 +239,7 @@ namespace Mahjong
 
             players[index].AddCard(tCards[0]);
             var moCard = tCards[0];
-            majiangTable.DrawMajiangAnimation(tCards[0], index);
+            majiangTable.DrawCard(tCards[0], index);
             SortCards(CurPlayerCards);
             tCards.RemoveAt(0);
         }
@@ -323,14 +323,14 @@ namespace Mahjong
                     break;
                 }
             }
-            majiangTable.PlayMajiangAnimation(card, CurPlayerCards, index);
+            majiangTable.DropCard(card, CurPlayerCards, index);
             //保存这个玩家出的牌
             pCard = CurPlayerCards[n];
             //清除
             CurPlayerCards.RemoveAt(n);
             //当前玩家重新排序
             SortCards(CurPlayerCards);
-            majiangTable.ShowMajiang(CurPlayerCards, index);
+            majiangTable.FreshCard(CurPlayerCards, index);
 
             //当前玩家出牌后，其他三个玩家进行检测胡、碰、杠操作
             CheckMajiang();
@@ -457,8 +457,8 @@ namespace Mahjong
             for (int i = 0; i < list.Count; i++)
                 CurPlayerCards.Remove(list[i]);
 
-            majiangTable.ShowMajiang(CurPlayerCards, index);
-            majiangTable.ShowPengMajiang(list, index);
+            majiangTable.FreshCard(CurPlayerCards, index);
+            majiangTable.ShowPengGang(list, index);
 
             //yield return new WaitForSeconds(1f);
 
@@ -482,8 +482,8 @@ namespace Mahjong
             for (int i = 0; i < list.Count; i++)
                 CurPlayerCards.Remove(list[i]);
 
-            majiangTable.ShowMajiang(CurPlayerCards, index);
-            majiangTable.ShowPengMajiang(list, index);
+            majiangTable.FreshCard(CurPlayerCards, index);
+            majiangTable.ShowPengGang(list, index);
 
             //杠完再摸一张、检测、再出
             DrawMajiang();
@@ -552,7 +552,7 @@ namespace Mahjong
 
             //玩家胡,显示赢家的麻将
             SortCards(players[winIndex].myCards);
-            majiangTable.ShowHuMajiang(players[winIndex].myCards);
+            majiangTable.ShowHu(players[winIndex].myCards);
 
             //控制器显示胜利
             GameOver();

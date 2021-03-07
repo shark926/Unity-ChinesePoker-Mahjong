@@ -33,7 +33,7 @@ namespace Mahjong
 
         public abstract void FreshCard(List<Card> list, int index);
 
-        public void Peng(List<Card> list)
+        public void ShowPengGang(List<Card> list)
         {
             pengPos += GetPengPosOffset();
 
@@ -57,7 +57,7 @@ namespace Mahjong
         {
         }
 
-        public void ShowHuMajiang(List<Card> list)
+        public void ShowHu(List<Card> list)
         {
             //牌的显示位置
             List<Vector3> pos = new List<Vector3>();
@@ -105,7 +105,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="players"></param>
         /// <returns></returns>
-        private IEnumerator SendMajiangCoroutine(List<Player> players)
+        private IEnumerator SendCardCoroutine(List<Player> players)
         {
             for (int i = 0; i < 13; i++)
             {
@@ -130,7 +130,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="mCardInfo"></param>
         /// <param name="index"></param>
-        public void DrawMajiangAnimation(Card mCardInfo, int index)
+        public void DrawCard(Card mCardInfo, int index)
         {
             seats[index].DrawCard(mCardInfo);
         }
@@ -141,7 +141,7 @@ namespace Mahjong
         /// <param name="name"></param>
         /// <param name="list"></param>
         /// <param name="index"></param>
-        public void PlayMajiangAnimation(Card cardInfo, List<Card> list, int index)
+        public void DropCard(Card cardInfo, List<Card> list, int index)
         {
             seats[index].DropCard(cardInfo);
         }
@@ -153,7 +153,7 @@ namespace Mahjong
         /// <param name="index"></param>
         /// <param name="isSend"></param>
         /// <returns></returns>
-        public void ShowMajiang(List<Card> list, int index)
+        public void FreshCard(List<Card> list, int index)
         {
             if (list.Count == 0)
             {
@@ -169,15 +169,15 @@ namespace Mahjong
         /// </summary>
         /// <param name="list"></param>
         /// <param name="index"></param>
-        public void ShowPengMajiang(List<Card> list, int index)
+        public void ShowPengGang(List<Card> list, int index)
         {
-            seats[index].Peng(list);
+            seats[index].ShowPengGang(list);
         }
 
-        public void ShowHuMajiang(List<Card> list)
+        public void ShowHu(List<Card> list)
         {
             // 胡牌暂时都是一样的，随意随便找个seat显示，因为它有table的引用
-            seats[0].ShowHuMajiang(list);
+            seats[0].ShowHu(list);
         }
     }
 }
