@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +11,7 @@ namespace Mahjong
         //Transform table = null;
         //一些按钮
         private Button btnStart;
+
         private Button btnRestart;
         private Button btnSetting;
         private Button btnBack;
@@ -59,6 +59,7 @@ namespace Mahjong
 
         //开始游戏
         private Action startGameEvent = null;
+
         public void AddStartGameEvent(Action action)
         {
             startGameEvent = action;
@@ -66,6 +67,7 @@ namespace Mahjong
 
         //重新开始游戏
         private Action restartGameEvent = null;
+
         public void AddReStartGameEvent(Action action)
         {
             restartGameEvent = action;
