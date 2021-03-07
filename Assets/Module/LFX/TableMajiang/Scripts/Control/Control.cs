@@ -191,16 +191,13 @@ namespace Mahjong
         /// <returns></returns>
         private void _sendMajiang()
         {
-            int n = 0;
-            //每个玩家发13个麻将
-            for (int i = 0; i < tCards.Count; i++)
+            for (int i = 0; i < 13; i++)
             {
-                players[n].AddCard(tCards[i]);
-                tCards.RemoveAt(i);
-                if (i % 13 == 12 && i != 0)
-                    n++;
-                if (n == 4)
-                    break;
+                for (int j = 0; j < 4; j++)
+                {
+                    players[j].AddCard(tCards[0]);
+                    tCards.RemoveAt(0);
+                }
             }
         }
 
@@ -260,12 +257,19 @@ namespace Mahjong
         /// </summary>
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
-        private void _playerClickMaJiang(int cardIndex, string cardName)
+        private void _playerClickMaJiang(CardType card)
         {
             if (index % 4 != 0 || isSend || !canClick)
                 return;
 
-            _playerPlay(cardIndex, cardName, true);
+            foreach (var item in CurPlayerCards)
+            {
+                if (item.Card == card)
+                {
+                    _playerPlay(item, true);
+                    return;
+                }
+            }
         }
 
         /// <summary>
@@ -277,7 +281,7 @@ namespace Mahjong
                 return;
 
             var card = AI.PlayCard(CurPlayerCards);
-            _playerPlay(card.cardIndex, card.cardName, false);
+            _playerPlay(card, false);
         }
 
         /// <summary>
@@ -287,12 +291,12 @@ namespace Mahjong
         /// <param name="cardName"></param>
         /// <param name="go"></param>
         /// <returns></returns>
-        private IEnumerator _waitCoroutine(int cardIndex, string cardName, bool go)
+        private IEnumerator _waitCoroutine(CardInfo cardInfo, bool go)
         {
             yield return new WaitForSeconds(1f);
             go = true;
 
-            _playerPlay(cardIndex, cardName, go);
+            _playerPlay(cardInfo, go);
         }
 
         private List<CardInfo> CurPlayerCards
@@ -308,26 +312,26 @@ namespace Mahjong
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
         /// <returns></returns>
-        private void _playerPlay(int cardIndex, string cardName, bool go)
+        private void _playerPlay(CardInfo card, bool go)
         {
             if (!go)
             {
-                UnitTool.ToolStartCoroutine(_waitCoroutine(cardIndex, cardName, false));
+                UnitTool.ToolStartCoroutine(_waitCoroutine(card, false));
                 return;
             }
 
             //当前玩家的出牌
-            Debug.Log("Player " + index + " 出 " + cardIndex);
+            Debug.Log("Player " + index + " 出 " + card.Card);
             int n = 0;
             for (int i = 0; i < CurPlayerCards.Count; i++)
             {
-                if (CurPlayerCards[i].cardName == cardName)
+                if (CurPlayerCards[i] == card)
                 {
                     n = i;
                     break;
                 }
             }
-            _majiangTable.PlayMajiangAnimation(cardName, CurPlayerCards, index);
+            _majiangTable.PlayMajiangAnimation(card, CurPlayerCards, index);
             //保存这个玩家出的牌
             pCard = CurPlayerCards[n];
             //清除
@@ -395,22 +399,25 @@ namespace Mahjong
         /// <returns></returns>
         private bool _checkPengGang()
         {
-            int result = -1;
+            CardType result = CardType.None;
             tempIndex = index;
             //检测其他三个玩家的碰、杠
             for (int i = index + 1; i < index + 4; i++)
             {
-                result = Rules.IsPeng(players[i % 4].myCards, pCard);
-                if (result == -1)
-                    result = Rules.IsGang(players[i % 4].myCards, pCard);
-                if (result != -1)
+                if (Rules.IsPeng(players[i % 4].myCards, pCard)
+                    || Rules.IsGang(players[i % 4].myCards, pCard))
+                {
+                    result = pCard.Card;
+                }
+
+                if (result != CardType.None)
                 {
                     index = i % 4;
                     //有玩家碰、杠了
                     temp.Clear();
                     for (int j = 0; j < CurPlayerCards.Count; j++)
                     {
-                        if (CurPlayerCards[j].cardIndex == result)
+                        if (CurPlayerCards[j].Card == result)
                         {
                             temp.Add(CurPlayerCards[j]);
                         }
@@ -595,16 +602,30 @@ namespace Mahjong
         /// </summary>
         private void _initCards()
         {
-            for (int i = 89; i < 123; i++)
+            foreach (int item in Enum.GetValues(typeof(CardType)))
             {
-                Sprite o = FileIO.LoadSprite(i);
-
-                for (int j = 0; j < 4; j++)
+                CardType cardType = (CardType)item;
+                if (cardType > CardType.None
+                    && cardType < CardType.Dong)
                 {
-                    CardInfo cardInfo = new CardInfo(o.name, j + 1);
-                    tCards.Add(cardInfo);
+                    for (int j = 0; j < 4; j++)
+                    {
+                        CardInfo cardInfo = new CardInfo(cardType);
+                        tCards.Add(cardInfo);
+                    }
                 }
             }
+
+            //for (int i = 89; i < 123; i++)
+            //{
+            //    Sprite o = FileIO.LoadSprite(i);
+
+            //    for (int j = 0; j < 4; j++)
+            //    {
+            //        CardInfo cardInfo = new CardInfo(o.name, j + 1);
+            //        tCards.Add(cardInfo);
+            //    }
+            //}
 
             //洗牌
             tCards = _getRandomList<CardInfo>(tCards);
@@ -620,7 +641,7 @@ namespace Mahjong
 
             list.Sort(delegate (CardInfo x, CardInfo y)
             {
-                return x.cardIndex.CompareTo(y.cardIndex);
+                return x.Card.CompareTo(y.Card);
             });
         }
 

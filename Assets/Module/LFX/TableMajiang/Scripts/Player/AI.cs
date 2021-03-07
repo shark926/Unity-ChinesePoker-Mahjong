@@ -13,7 +13,7 @@ namespace Mahjong
 
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i].cardIndex == x)
+                if (list[i].Card == x)
                 {
                     return list[i];
                 }
@@ -27,14 +27,14 @@ namespace Mahjong
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private static int FindDropCard(List<CardInfo> list)
+        private static CardType FindDropCard(List<CardInfo> list)
         {
-            int index = -1;
-            List<int> cards = new List<int>();
+            CardType index = CardType.None;
+            List<CardType> cards = new List<CardType>();
 
             for (int i = 0; i < list.Count; i++)
             {
-                cards.Add(list[i].cardIndex);
+                cards.Add(list[i].Card);
             }
 
             if (cards[0] != cards[1] && (cards[0] + 1) != cards[1])

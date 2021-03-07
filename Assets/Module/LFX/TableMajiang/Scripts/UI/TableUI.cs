@@ -149,9 +149,9 @@ namespace Mahjong
         }
 
         //出牌
-        private Action<int, string> _playerClickEvent;
+        private Action<CardType> _playerClickEvent;
 
-        public void AddPlayerClickEven(Action<int, string> action)
+        public void AddPlayerClickEven(Action<CardType> action)
         {
             _playerClickEvent = action;
         }
@@ -172,87 +172,13 @@ namespace Mahjong
             {
                 GameObject o = GameObject.Instantiate(obj, new Vector3(0, 3, 0), Quaternion.identity, transform) as GameObject;
                 MCard c = o.GetComponent<MCard>();
-                c.name = list[i].cardName;
-                c.cardIndex = list[i].cardIndex;
+
+                c.SetCard(list[i].Card);
+                list[i].UserData = c;
                 //绑定麻将点击事件
                 c.AddSetSelectEvent(_clickMajiang);
                 uiCards.Add(c);
             }
-        }
-
-        /// <summary>
-        /// 加载麻将图片
-        /// </summary>
-        /// <param name="mCardInfo"></param>
-        /// <returns></returns>
-        private Sprite _initImage(CardInfo mCardInfo, int type)
-        {
-            //根据卡牌信息生成图片
-            string path;
-
-            Sprite sprite = null;
-
-            //由于没有提供根据名字来加载的方法，所以只能自己通过名字取index来加载
-
-            if (type == 0)
-            {
-                int i = 0;
-                string name = "n_" + mCardInfo.cardIndex.ToString();
-                path = "lfx/tablemajiang/spritepack/majiang/" + name;
-                for (i = 0; i < R.SpritePack.path.Length; i++)
-                {
-                    if (path == R.SpritePack.path[i])
-                    {
-                        break;
-                    }
-                }
-                sprite = FileIO.LoadSprite(i);
-            }
-            else if (type == 1)
-                sprite = FileIO.LoadSprite(125);
-            else if (type == 2)
-                sprite = FileIO.LoadSprite(123);
-            else if (type == 3)
-                sprite = FileIO.LoadSprite(124);
-
-            if (sprite == null)
-            {
-                Debug.Log("Sprite Null");
-                return null;
-            }
-            else
-                return sprite;
-        }
-
-        /// <summary>
-        /// 加载出出去的麻将的图片
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private Sprite _initSendImg(string name)
-        {
-            int i = 0;
-            Sprite sprite = null;
-            string path;
-            name = name.Split('_')[0];
-            name = "b_" + name;
-            path = "lfx/tablemajiang/spritepack/majiang/" + name;
-            for (i = 0; i < R.SpritePack.path.Length; i++)
-            {
-                if (path == R.SpritePack.path[i])
-                {
-                    break;
-                }
-            }
-            sprite = FileIO.LoadSprite(i);
-
-            if (sprite == null)
-            {
-                Debug.Log("Sprite Null");
-                return null;
-            }
-            else
-                return sprite;
         }
 
         /// <summary>
@@ -284,7 +210,9 @@ namespace Mahjong
                 for (int j = 0; j < 4; j++)
                 {
                     yield return new WaitForSeconds(0.1f);
-                    _majiangAnimation(players[j].myCards[i], pos[j][i], j, false);
+
+                    CardInfo cardInfo = players[j].myCards[i];
+                    _majiangAnimation(cardInfo, pos[j][i], j);
                 }
             }
             yield return new WaitForSeconds(0.5f);
@@ -303,21 +231,31 @@ namespace Mahjong
         /// <param name="pos"></param>
         /// <param name="index"></param>
         /// <param name="isSend"></param>
-        private void _majiangAnimation(CardInfo mCardInfo, Vector3 pos, int index, bool isSend)
+        private void _majiangAnimation(CardInfo mCardInfo, Vector3 pos, int index)
         {
             var card = GetCardObject(mCardInfo);
             card.transform.localScale = new Vector3(1, 1, 1);
-            card.image.sprite = _initImage(mCardInfo, index);
 
-            if (!isSend)
+            if (index == 0)
             {
-                card.transform.SetParent(playerTrans[index]);
-                card.transform.SetAsFirstSibling();
+                card.SetCardState(CardState.N);
             }
-            else
+            else if (index == 1)
             {
-                card.transform.SetParent(table);
+                card.SetCardState(CardState.Right);
             }
+            else if (index == 2)
+            {
+                card.SetCardState(CardState.Opp);
+            }
+            else if (index == 3)
+            {
+                card.SetCardState(CardState.Left);
+            }
+            //card.image.sprite = _initImage(mCardInfo, index);
+
+            card.transform.SetParent(playerTrans[index]);
+            card.transform.SetAsFirstSibling();
 
             _moveMajiang(mCardInfo, pos);
         }
@@ -347,7 +285,7 @@ namespace Mahjong
                 pos = playerTrans[index].position + new Vector3(-2f, -3.8f, 0);
             }
 
-            _majiangAnimation(mCardInfo, pos + new Vector3(2, 0, 0), index, false);
+            _majiangAnimation(mCardInfo, pos + new Vector3(2, 0, 0), index);
         }
 
         /// <summary>
@@ -356,7 +294,7 @@ namespace Mahjong
         /// <param name="name"></param>
         /// <param name="list"></param>
         /// <param name="index"></param>
-        public void PlayMajiangAnimation(string name, List<CardInfo> list, int index)
+        public void PlayMajiangAnimation(CardInfo cardInfo, List<CardInfo> list, int index)
         {
             Vector3 pos = new Vector3();
             if (index == 0)
@@ -376,17 +314,18 @@ namespace Mahjong
                 pos = playerTrans[3].position + new Vector3(2f, -2.5f, 0);
             }
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                var card = GetCardObject(list[i]);
-                if (card.name == name)
+            //for (int i = 0; i < list.Count; i++)
+            //{
+            //var card = GetCardObject(list[i]);
+            var card = GetCardObject(cardInfo);
+                //if (card.name == name)
                 {
-                    card.image.sprite = _initSendImg(name);
+                    card.SetCardState(CardState.B);
                     card.transform.position = pos;
                     card.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                     card.transform.SetParent(table);
                 }
-            }
+            //}
         }
 
         /// <summary>
@@ -407,7 +346,7 @@ namespace Mahjong
             List<Vector3> pos = _getMajiangPos(list, index);
             for (int i = 0; i < list.Count; i++)
             {
-                _majiangAnimation(list[i], pos[i], index, false);
+                _majiangAnimation(list[i], pos[i], index);
             }
         }
 
@@ -432,7 +371,7 @@ namespace Mahjong
             for (int i = 0; i < list.Count; i++)
             {
                 pos.x += 0.5f;
-                GetCardObject(list[i]).image.sprite = _initSendImg(list[i].cardName);
+                GetCardObject(list[i]).SetCardState(CardState.B);
                 GetCardObject(list[i]).transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
                 _moveMajiang(list[i], pos);
                 GetCardObject(list[i]).transform.SetParent(table);
@@ -460,7 +399,7 @@ namespace Mahjong
             for (int i = 0; i < pos.Count; i++)
             {
                 var card = GetCardObject(list[i]);
-                card.image.sprite = _initSendImg(card.name);
+                card.SetCardState(CardState.B);
                 card.transform.SetParent(table);
                 card.transform.SetAsLastSibling();
                 card.transform.localScale = new Vector3(1, 1, 1);
@@ -521,16 +460,7 @@ namespace Mahjong
         /// <returns></returns>
         public MCard GetCardObject(CardInfo cardInfo)
         {
-            MCard card = null;
-            foreach (var c in uiCards)
-            {
-                if (c.name == cardInfo.cardName)
-                {
-                    card = c;
-                }
-            }
-
-            return card;
+            return (MCard)cardInfo.UserData;
         }
 
         /// <summary>
@@ -627,20 +557,12 @@ namespace Mahjong
         /// <summary>
         /// 麻将点击事件
         /// </summary>
-        /// <param name="name"></param>
-        private void _clickMajiang(string name)
+        /// <param name="card"></param>
+        private void _clickMajiang(MCard card)
         {
             if (_playerClickEvent != null)
             {
-                int n = 0;
-                for (int i = 0; i < uiCards.Count; i++)
-                {
-                    if (uiCards[i].name == name)
-                    {
-                        n = uiCards[i].cardIndex;
-                    }
-                }
-                _playerClickEvent(n, name);
+                _playerClickEvent(card.Card);
             }
         }
 

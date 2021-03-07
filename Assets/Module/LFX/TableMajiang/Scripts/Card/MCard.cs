@@ -16,45 +16,7 @@ namespace Mahjong
 
     public class MCard : MonoBehaviour
     {
-        private string _name;
-        private int _cardIndex;               //索引
-        private Image _image;                 //图片
-
-        public string name
-        {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                _name = value;
-            }
-        }
-
-        public int cardIndex
-        {
-            get
-            {
-                return _cardIndex;
-            }
-            set
-            {
-                _cardIndex = value;
-            }
-        }
-
-        public Image image
-        {
-            get
-            {
-                return _image;
-            }
-            set
-            {
-                _image = value;
-            }
-        }
+        private Image _image;
 
         private CardType card;
 
@@ -95,14 +57,14 @@ namespace Mahjong
             string assetName = null;
             if (state == CardState.B || state == CardState.N)
             {
-                assetName = string.Format("{0}_{1}", state, card);
+                assetName = string.Format("{0}_{1}", state, (int)card);
             }
             else
             {
                 assetName = state.ToString();
             }
 
-            string assetPath = string.Format("{0}{1}", path, assetName);
+            string assetPath = string.Format("{0}{1}", path, assetName.ToLower());
 
             Sprite sprite = Resources.Load<Sprite>(assetPath);
 
@@ -110,9 +72,9 @@ namespace Mahjong
         }
 
         //点击事件
-        private Action<string> SetSelectEvent;
+        private Action<MCard> SetSelectEvent;
 
-        public void AddSetSelectEvent(Action<string> action)
+        public void AddSetSelectEvent(Action<MCard> action)
         {
             SetSelectEvent = action;
         }
@@ -132,7 +94,7 @@ namespace Mahjong
 
             if (SetSelectEvent != null)
             {
-                SetSelectEvent(this.name);
+                SetSelectEvent(this);
             }
         }
 
