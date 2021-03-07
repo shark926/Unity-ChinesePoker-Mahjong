@@ -11,12 +11,9 @@ namespace Mahjong
     {
         private List<Seat> seats = new List<Seat>(4);
 
-        //4个玩家碰杠的位置
-        private List<Vector3> playerPengPos = new List<Vector3>();
-
+        //Transform table = null;
         //一些按钮
         private Button btnStart;
-
         private Button btnRestart;
         private Button btnSetting;
         private Button btnBack;
@@ -24,7 +21,6 @@ namespace Mahjong
         private Button btnGang;
         private Button btnHu;
         private Button btnPass;
-        private Button temp;
 
         public TableUI() : base(UIType.Normal, UIMode.DoNothing, UICollider.None)
         {
@@ -38,6 +34,8 @@ namespace Mahjong
             seats.Add(new SeatOppsite());
             seats.Add(new SeatLeft());
 
+            //table = GameObject.Find("Content/Table").transform;
+
             btnStart = GameObject.Find("Content/Button_start").GetComponent<Button>();
             btnRestart = GameObject.Find("Content/Button_restart").GetComponent<Button>();
             btnSetting = GameObject.Find("Content/Button_tablesetting").GetComponent<Button>();
@@ -48,95 +46,87 @@ namespace Mahjong
             btnHu = GameObject.FindGameObjectWithTag("Hu").GetComponent<Button>();
             btnPass = GameObject.FindGameObjectWithTag("Pass").GetComponent<Button>();
 
+            btnStart.onClick.AddListener(OnStartGame);
+            btnRestart.onClick.AddListener(OnRestart);
+            btnSetting.onClick.AddListener(OnSetting);
+            btnBack.onClick.AddListener(OnBack);
 
-            playerPengPos.Add(GameObject.Find("Content/Player0/Peng").transform.position);
-            playerPengPos.Add(GameObject.Find("Content/PlayerAI1/Peng").transform.position);
-            playerPengPos.Add(GameObject.Find("Content/PlayerAI2/Peng").transform.position);
-            playerPengPos.Add(GameObject.Find("Content/PlayerAI3/Peng").transform.position);
-
-            btnStart.onClick.AddListener(_btn_StartGame);
-            btnRestart.onClick.AddListener(_btn_Restart);
-            btnSetting.onClick.AddListener(_btn_Setting);
-            btnBack.onClick.AddListener(_btn_Back);
-
-            btnPeng.onClick.AddListener(_btn_Peng);
-            btnGang.onClick.AddListener(_btn_Gang);
-            btnHu.onClick.AddListener(_btn_Hu);
-            btnPass.onClick.AddListener(_btn_Pass);
+            btnPeng.onClick.AddListener(OnPeng);
+            btnGang.onClick.AddListener(OnGang);
+            btnHu.onClick.AddListener(OnHu);
+            btnPass.onClick.AddListener(OnPass);
 
             btnRestart.gameObject.SetActive(false);
         }
 
         //开始游戏
-        private Action _startGameEvent = null;
-
+        private Action startGameEvent = null;
         public void AddStartGameEvent(Action action)
         {
-            _startGameEvent = action;
+            startGameEvent = action;
         }
 
         //重新开始游戏
-        private Action _reStartGameEvent = null;
-
+        private Action restartGameEvent = null;
         public void AddReStartGameEvent(Action action)
         {
-            _reStartGameEvent = action;
+            restartGameEvent = action;
         }
 
         //打开设置
-        private Action _settingEvetn = null;
+        private Action settingEvetn = null;
 
         public void AddSettingEvent(Action action)
         {
-            _settingEvetn = action;
+            settingEvetn = action;
         }
 
         //完成发牌动画，开始出牌
-        private Action _finshSendAnitmaEvent;
+        private Action finshSendAnitmaEvent;
 
         public void AddFinshSendAnitmaEvent(Action action)
         {
-            _finshSendAnitmaEvent = action;
+            finshSendAnitmaEvent = action;
         }
 
         //碰
-        private Action _pengEvent;
+        private Action pengEvent;
 
         public void AddPengEvent(Action action)
         {
-            _pengEvent = action;
+            pengEvent = action;
         }
 
         //杠
-        private Action _gangEvent;
+        private Action gangEvent;
 
         public void AddGangEvent(Action action)
         {
-            _gangEvent = action;
+            gangEvent = action;
         }
 
         //胡
-        private Action _huEvent;
+        private Action huEvent;
 
         public void AddHuEvent(Action action)
         {
-            _huEvent = action;
+            huEvent = action;
         }
 
         //过
-        private Action _passEvent;
+        private Action passEvent;
 
         public void AddPassEvent(Action action)
         {
-            _passEvent = action;
+            passEvent = action;
         }
 
         //出牌
-        private Action<CardIndex> _playerClickEvent;
+        private Action<CardIndex> playerClickEvent;
 
         public void AddPlayerClickEven(Action<CardIndex> action)
         {
-            _playerClickEvent = action;
+            playerClickEvent = action;
         }
 
         /// <summary>
@@ -191,9 +181,9 @@ namespace Mahjong
             yield return new WaitForSeconds(0.5f);
 
             //告诉控制器发牌动画完成了.可以出牌了
-            if (_finshSendAnitmaEvent != null)
+            if (finshSendAnitmaEvent != null)
             {
-                _finshSendAnitmaEvent();
+                finshSendAnitmaEvent();
             }
         }
 
@@ -253,16 +243,6 @@ namespace Mahjong
         }
 
         /// <summary>
-        /// 根据数据返回卡牌物体
-        /// </summary>
-        /// <param name="cardInfo"></param>
-        /// <returns></returns>
-        public MCard GetCardObject(Card cardInfo)
-        {
-            return (MCard)cardInfo.UserData;
-        }
-
-        /// <summary>
         /// 清除UI数据
         /// </summary>
         public void ClearUi()
@@ -287,7 +267,7 @@ namespace Mahjong
         /// <summary>
         /// 返回大厅
         /// </summary>
-        private void _btn_Back()
+        private void OnBack()
         {
             Hide();
         }
@@ -295,11 +275,11 @@ namespace Mahjong
         /// <summary>
         /// 开始游戏
         /// </summary>
-        private void _btn_StartGame()
+        private void OnStartGame()
         {
-            if (_startGameEvent != null)
+            if (startGameEvent != null)
             {
-                _startGameEvent();
+                startGameEvent();
             }
             //点击开始游戏后再显示重新开始按钮
             btnRestart.gameObject.SetActive(true);
@@ -309,22 +289,22 @@ namespace Mahjong
         /// <summary>
         /// 重新开始游戏
         /// </summary>
-        private void _btn_Restart()
+        private void OnRestart()
         {
-            if (_reStartGameEvent != null)
+            if (restartGameEvent != null)
             {
-                _reStartGameEvent();
+                restartGameEvent();
             }
         }
 
         /// <summary>
         /// 桌面设置界面
         /// </summary>
-        private void _btn_Setting()
+        private void OnSetting()
         {
-            if (_settingEvetn != null)
+            if (settingEvetn != null)
             {
-                _settingEvetn();
+                settingEvetn();
             }
         }
 
@@ -334,53 +314,53 @@ namespace Mahjong
         /// <param name="card"></param>
         private void _clickMajiang(MCard card)
         {
-            if (_playerClickEvent != null)
+            if (playerClickEvent != null)
             {
-                _playerClickEvent(card.Card);
+                playerClickEvent(card.Card);
             }
         }
 
         /// <summary>
         /// 玩家点击碰
         /// </summary>
-        private void _btn_Peng()
+        private void OnPeng()
         {
-            if (_pengEvent != null)
+            if (pengEvent != null)
             {
-                _pengEvent();
+                pengEvent();
             }
         }
 
         /// <summary>
         /// 玩家点击杠
         /// </summary>
-        private void _btn_Gang()
+        private void OnGang()
         {
-            if (_gangEvent != null)
+            if (gangEvent != null)
             {
-                _gangEvent();
+                gangEvent();
             }
         }
 
         /// <summary>
         /// 玩家点击胡
         /// </summary>
-        private void _btn_Hu()
+        private void OnHu()
         {
-            if (_huEvent != null)
+            if (huEvent != null)
             {
-                _huEvent();
+                huEvent();
             }
         }
 
         /// <summary>
         /// 玩家点击过
         /// </summary>
-        private void _btn_Pass()
+        private void OnPass()
         {
-            if (_passEvent != null)
+            if (passEvent != null)
             {
-                _passEvent();
+                passEvent();
             }
         }
     }

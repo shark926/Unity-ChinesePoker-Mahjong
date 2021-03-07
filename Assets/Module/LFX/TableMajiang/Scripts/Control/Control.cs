@@ -11,10 +11,8 @@ namespace Mahjong
     /// </summary>
     public class Control
     {
-        #region 变量
-
         //桌面
-        private TableUI _majiangTable;
+        private TableUI majiangTable;
 
         //桌面牌数据
         private List<Card> tCards = new List<Card>();
@@ -46,11 +44,9 @@ namespace Mahjong
         //是否能点击麻将
         private bool canClick = true;
 
-        #endregion 变量
-
         public Control()
         {
-            _majiangTable = new TableUI();
+            majiangTable = new TableUI();
 
             //生成玩家索引
             startIndex = MyUtil.GetRange(0, 4);
@@ -63,133 +59,129 @@ namespace Mahjong
             }
 
             //添加按钮代理 Action (绑定界面按钮事件)
-            _addAction();
+            AddAction();
         }
 
         //Action，碰，杠，胡，过, 开始游戏， 重新开始游戏
 
-        #region Action
-
         //设置
-        private Action _settingEvent = null;
+        private Action settingEvent = null;
 
         public void AddSettingEvent(Action action)
         {
-            _settingEvent = action;
+            settingEvent = action;
         }
 
         //输赢界面
-        private Action<string> _gameOverEvent = null;
+        private Action<string> gameOverEvent = null;
 
         public void AddGameOverEvent(Action<string> action)
         {
-            _gameOverEvent = action;
+            gameOverEvent = action;
         }
-
-        #endregion Action
 
         /// <summary>
         /// 显示桌面UI
         /// </summary>
         public void ShowMajiangUI()
         {
-            WTUIPage.ShowPage("MajiangUI", _majiangTable);
+            WTUIPage.ShowPage("MajiangUI", majiangTable);
         }
 
         /// <summary>
         /// 显示设置界面
         /// </summary>
-        private void _showSetting()
+        private void ShowSetting()
         {
-            if (_settingEvent != null)
+            if (settingEvent != null)
             {
-                _settingEvent();
+                settingEvent();
             }
         }
 
         /// <summary>
         /// 绑定代理事件
         /// </summary>
-        private void _addAction()
+        private void AddAction()
         {
-            _majiangTable.AddStartGameEvent(_startGame);
-            _majiangTable.AddReStartGameEvent(_restartGame);
-            _majiangTable.AddSettingEvent(_showSetting);
+            majiangTable.AddStartGameEvent(StartGame);
+            majiangTable.AddReStartGameEvent(RestartGame);
+            majiangTable.AddSettingEvent(ShowSetting);
 
             //玩家点击麻将出牌事件
-            _majiangTable.AddPlayerClickEven(_playerClickMaJiang);
+            majiangTable.AddPlayerClickEven(PlayerClickMaJiang);
             //完成发牌动画后出牌
-            _majiangTable.AddFinshSendAnitmaEvent(_startPlayMajiang);
+            majiangTable.AddFinshSendAnitmaEvent(StartPlayMajiang);
 
             //玩家按钮按钮事件碰胡杠过
-            _majiangTable.AddPengEvent(delegate ()
+            majiangTable.AddPengEvent(delegate ()
             {
                 canClick = true;
-                _buttonPeng();
+                ButtonPeng();
             });
-            _majiangTable.AddGangEvent(delegate ()
+            majiangTable.AddGangEvent(delegate ()
             {
                 canClick = true;
-                _buttonGang();
+                ButtonGang();
             });
-            _majiangTable.AddHuEvent(delegate ()
+            majiangTable.AddHuEvent(delegate ()
             {
-                _setButton(false, false, false, false);
-                _huMajiang();
+                SetButton(false, false, false, false);
+                HuMajiang();
             });
-            _majiangTable.AddPassEvent(delegate ()
+            majiangTable.AddPassEvent(delegate ()
             {
                 canClick = true;
-                _setButton(false, false, false, false);
+                SetButton(false, false, false, false);
                 index = tempIndex;
                 index++;
                 index = index % 4;
-                _computerAIPlayMajiang();
+                ComputerAIPlayMajiang();
             });
         }
 
         /// <summary>
         /// 开始游戏
         /// </summary>
-        private void _startGame()
+        private void StartGame()
         {
             //生成麻将数据(包括洗牌)
-            _initCards();
+            InitCards();
 
             //实例化到桌 桌调用UI（传数据）
-            _majiangTable.InstanceCards(tCards);
+            majiangTable.InstanceCards(tCards);
 
             //发牌给四个玩家（只发数据）
-            _sendMajiang();
+            SendMajiang();
 
             //排序
-            _playerSortCards();
+            PlayerSortCards();
 
             //显示发牌动画(发牌动画完成后UI回调开始出麻将)
             isSend = true;
-            _majiangTable.SendMajiangAnimation(players);
+            majiangTable.SendMajiangAnimation(players);
         }
 
         /// <summary>
         /// 重新开始游戏
         /// </summary>
-        private void _restartGame()
+        private void RestartGame()
         {
             //关闭所有协程
             UnitTool.ToolStopAllCoroutines();
 
             //清除玩家和桌控制器的数据，重置UI的显示
-            _clearDatas();
+            ClearDatas();
 
             //调用开始游戏
-            _startGame();
+            StartGame();
         }
 
         /// <summary>
         /// 发牌
         /// </summary>
         /// <returns></returns>
-        private void _sendMajiang()
+        private void SendMajiang()
         {
             for (int i = 0; i < 13; i++)
             {
@@ -204,12 +196,12 @@ namespace Mahjong
         /// <summary>
         /// 完成动画后开始出牌回调函数
         /// </summary>
-        private void _startPlayMajiang()
+        private void StartPlayMajiang()
         {
             //庄家先摸牌
-            _drawMajiang();
+            DrawMajiang();
             //摸牌后检测胡牌
-            if (_checkHu(CurPlayerCards, null, index))
+            if (CheckHu(CurPlayerCards, null, index))
                 return;
 
             isSend = false;
@@ -222,14 +214,14 @@ namespace Mahjong
             else
             {
                 //庄家是电脑
-                _computerAIPlayMajiang();
+                ComputerAIPlayMajiang();
             }
         }
 
         /// <summary>
         /// 玩家摸牌
         /// </summary>
-        private void _drawMajiang()
+        private void DrawMajiang()
         {
             //该玩家摸牌
             if (tCards.Count == 0)
@@ -238,17 +230,17 @@ namespace Mahjong
                 Debug.Log("牌抓完了...平局");
                 //打开平局面板
                 UnitTool.ToolStopAllCoroutines();
-                if (_gameOverEvent != null)
+                if (gameOverEvent != null)
                 {
-                    _gameOverEvent("平局");
+                    gameOverEvent("平局");
                 }
                 return;
             }
 
             players[index].AddCard(tCards[0]);
             var moCard = tCards[0];
-            _majiangTable.DrawMajiangAnimation(tCards[0], index);
-            _sortCards(CurPlayerCards);
+            majiangTable.DrawMajiangAnimation(tCards[0], index);
+            SortCards(CurPlayerCards);
             tCards.RemoveAt(0);
         }
 
@@ -257,7 +249,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
-        private void _playerClickMaJiang(CardIndex card)
+        private void PlayerClickMaJiang(CardIndex card)
         {
             if (index % 4 != 0 || isSend || !canClick)
                 return;
@@ -266,7 +258,7 @@ namespace Mahjong
             {
                 if (item.CardIndex == card)
                 {
-                    _playerPlay(item, true);
+                    PlayerPlay(item, true);
                     return;
                 }
             }
@@ -275,13 +267,13 @@ namespace Mahjong
         /// <summary>
         /// 电脑玩家AI出麻将
         /// </summary>
-        private void _computerAIPlayMajiang()
+        private void ComputerAIPlayMajiang()
         {
             if (index % 4 == 0)
                 return;
 
             var card = AI.PlayCard(CurPlayerCards);
-            _playerPlay(card, false);
+            PlayerPlay(card, false);
         }
 
         /// <summary>
@@ -291,12 +283,12 @@ namespace Mahjong
         /// <param name="cardName"></param>
         /// <param name="go"></param>
         /// <returns></returns>
-        private IEnumerator _waitCoroutine(Card cardInfo, bool go)
+        private IEnumerator WaitCoroutine(Card cardInfo, bool go)
         {
             yield return new WaitForSeconds(1f);
             go = true;
 
-            _playerPlay(cardInfo, go);
+            PlayerPlay(cardInfo, go);
         }
 
         private List<Card> CurPlayerCards
@@ -312,11 +304,11 @@ namespace Mahjong
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
         /// <returns></returns>
-        private void _playerPlay(Card card, bool go)
+        private void PlayerPlay(Card card, bool go)
         {
             if (!go)
             {
-                UnitTool.ToolStartCoroutine(_waitCoroutine(card, false));
+                UnitTool.ToolStartCoroutine(WaitCoroutine(card, false));
                 return;
             }
 
@@ -331,73 +323,73 @@ namespace Mahjong
                     break;
                 }
             }
-            _majiangTable.PlayMajiangAnimation(card, CurPlayerCards, index);
+            majiangTable.PlayMajiangAnimation(card, CurPlayerCards, index);
             //保存这个玩家出的牌
             pCard = CurPlayerCards[n];
             //清除
             CurPlayerCards.RemoveAt(n);
             //当前玩家重新排序
-            _sortCards(CurPlayerCards);
-            _majiangTable.ShowMajiang(CurPlayerCards, index);
+            SortCards(CurPlayerCards);
+            majiangTable.ShowMajiang(CurPlayerCards, index);
 
             //当前玩家出牌后，其他三个玩家进行检测胡、碰、杠操作
-            _checkMajiang();
+            CheckMajiang();
         }
 
         /// <summary>
         /// 控制器检测胡、杠、碰
         /// </summary>
         /// <returns></returns>
-        private void _checkMajiang()
+        private void CheckMajiang()
         {
             //检测其他三个玩家是否能胡牌
-            if (_checkThreePlayerHu())
+            if (CheckThreePlayerHu())
                 return;
 
             //检测碰、杠
-            if (_checkPengGang())
+            if (CheckPengGang())
                 return;
 
             //下一个玩家摸牌、检测、出牌
             index++;
             index = index % 4;
-            _drawMajiang();
+            DrawMajiang();
 
-            if (_checkHu(CurPlayerCards, null, index))
+            if (CheckHu(CurPlayerCards, null, index))
                 return;
 
             //电脑出牌
             if (index % 4 != 0)
             {
-                _computerAIPlayMajiang();
+                ComputerAIPlayMajiang();
             }
         }
 
         /// <summary>
         /// 碰按钮调用
         /// </summary>
-        private void _buttonPeng()
+        private void ButtonPeng()
         {
-            _setButton(false, false, false, false);
+            SetButton(false, false, false, false);
             UnitTool.ToolStopAllCoroutines();
-            _peng(temp);
+            Peng(temp);
         }
 
         /// <summary>
         /// 杠按钮调用
         /// </summary>
-        private void _buttonGang()
+        private void ButtonGang()
         {
-            _setButton(false, false, false, false);
+            SetButton(false, false, false, false);
             UnitTool.ToolStopAllCoroutines();
-            _gang(temp);
+            Gang(temp);
         }
 
         /// <summary>
         /// 检测碰、杠
         /// </summary>
         /// <returns></returns>
-        private bool _checkPengGang()
+        private bool CheckPengGang()
         {
             CardIndex result = CardIndex.None;
             tempIndex = index;
@@ -428,9 +420,9 @@ namespace Mahjong
                     if (index != 0)
                     {
                         if (temp.Count == 3)
-                            _peng(temp);
+                            Peng(temp);
                         if (temp.Count == 4)
-                            _gang(temp);
+                            Gang(temp);
                         temp.Clear();
                         return true;
                     }
@@ -440,9 +432,9 @@ namespace Mahjong
                     {
                         canClick = false;
                         if (temp.Count == 3)
-                            _setButton(true, false, false, true);
+                            SetButton(true, false, false, true);
                         else
-                            _setButton(false, true, false, true);
+                            SetButton(false, true, false, true);
                         //等待过按钮按下
                         return true;
                     }
@@ -458,22 +450,22 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        private void _peng(List<Card> list)
+        private void Peng(List<Card> list)
         {
             Debug.Log("Player " + index.ToString() + " 碰!");
 
             for (int i = 0; i < list.Count; i++)
                 CurPlayerCards.Remove(list[i]);
 
-            _majiangTable.ShowMajiang(CurPlayerCards, index);
-            _majiangTable.ShowPengMajiang(list, index);
+            majiangTable.ShowMajiang(CurPlayerCards, index);
+            majiangTable.ShowPengMajiang(list, index);
 
             //yield return new WaitForSeconds(1f);
 
             //电脑碰完直接出
             if (index % 4 != 0)
             {
-                _computerAIPlayMajiang();
+                ComputerAIPlayMajiang();
             }
         }
 
@@ -483,26 +475,26 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        private void _gang(List<Card> list)
+        private void Gang(List<Card> list)
         {
             Debug.Log("Player " + index.ToString() + " 杠!");
 
             for (int i = 0; i < list.Count; i++)
                 CurPlayerCards.Remove(list[i]);
 
-            _majiangTable.ShowMajiang(CurPlayerCards, index);
-            _majiangTable.ShowPengMajiang(list, index);
+            majiangTable.ShowMajiang(CurPlayerCards, index);
+            majiangTable.ShowPengMajiang(list, index);
 
             //杠完再摸一张、检测、再出
-            _drawMajiang();
-            if (_checkHu(CurPlayerCards, null, index))
+            DrawMajiang();
+            if (CheckHu(CurPlayerCards, null, index))
                 return;
 
             //yield return new WaitForSeconds(1f);
 
             if (index % 4 != 0)
             {
-                _computerAIPlayMajiang();
+                ComputerAIPlayMajiang();
             }
         }
 
@@ -512,7 +504,7 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="mCardInfo"></param>
         /// <returns></returns>
-        private bool _checkHu(List<Card> list, Card mCardInfo, int win)
+        private bool CheckHu(List<Card> list, Card mCardInfo, int win)
         {
             bool canHu = false;
             if (Rules.IsCanHU(list, mCardInfo))
@@ -523,24 +515,24 @@ namespace Mahjong
                     players[win].myCards.Add(pCard);
                 if (winIndex % 4 != 0)
                 {
-                    _huMajiang();
+                    HuMajiang();
                 }
                 else
                 {
-                    _setButton(false, false, true, false);
+                    SetButton(false, false, true, false);
                 }
             }
 
             return canHu;
         }
 
-        private bool _checkThreePlayerHu()
+        private bool CheckThreePlayerHu()
         {
             //检测三个玩家是否胡
             bool isHu = false;
             for (int i = index + 1; i < index + 4; i++)
             {
-                if (_checkHu(players[i % 4].myCards, pCard, i % 4))
+                if (CheckHu(players[i % 4].myCards, pCard, i % 4))
                 {
                     isHu = true;
                     break;
@@ -553,35 +545,35 @@ namespace Mahjong
         /// <summary>
         /// 胡牌
         /// </summary>
-        private void _huMajiang()
+        private void HuMajiang()
         {
             //停止所有协程
             UnitTool.ToolStopAllCoroutines();
 
             //玩家胡,显示赢家的麻将
-            _sortCards(players[winIndex].myCards);
-            _majiangTable.ShowHuMajiang(players[winIndex].myCards);
+            SortCards(players[winIndex].myCards);
+            majiangTable.ShowHuMajiang(players[winIndex].myCards);
 
             //控制器显示胜利
-            _gameOver();
+            GameOver();
         }
 
         /// <summary>
         /// 游戏结束
         /// </summary>
         /// <returns></returns>
-        private void _gameOver()
+        private void GameOver()
         {
             Debug.Log("Player " + winIndex + " Win");
 
-            if (_gameOverEvent != null)
+            if (gameOverEvent != null)
             {
                 string info;
                 if (winIndex % 4 == 0)
                     info = "你赢了！！！";
                 else
                     info = "Player " + winIndex + "赢了\n" + "你输了...";
-                _gameOverEvent(info);
+                gameOverEvent(info);
             }
         }
 
@@ -592,15 +584,15 @@ namespace Mahjong
         /// <param name="gang"></param>
         /// <param name="hu"></param>
         /// <param name="pass"></param>
-        private void _setButton(bool peng, bool gang, bool hu, bool pass)
+        private void SetButton(bool peng, bool gang, bool hu, bool pass)
         {
-            _majiangTable.SetButton(peng, gang, hu, pass);
+            majiangTable.SetButton(peng, gang, hu, pass);
         }
 
         /// <summary>
         /// 生成卡牌数据
         /// </summary>
-        private void _initCards()
+        private void InitCards()
         {
             foreach (int item in Enum.GetValues(typeof(CardIndex)))
             {
@@ -616,25 +608,14 @@ namespace Mahjong
                 }
             }
 
-            //for (int i = 89; i < 123; i++)
-            //{
-            //    Sprite o = FileIO.LoadSprite(i);
-
-            //    for (int j = 0; j < 4; j++)
-            //    {
-            //        CardInfo cardInfo = new CardInfo(o.name, j + 1);
-            //        tCards.Add(cardInfo);
-            //    }
-            //}
-
             //洗牌
-            tCards = _getRandomList<Card>(tCards);
+            tCards = GetRandomList<Card>(tCards);
         }
 
         /// <summary>
         /// 排序当前手牌
         /// </summary>
-        private void _sortCards(List<Card> list)
+        private void SortCards(List<Card> list)
         {
             if (list.Count == 0)
                 return;
@@ -651,7 +632,7 @@ namespace Mahjong
         /// <typeparam name="T"></typeparam>
         /// <param name="inputList"></param>
         /// <returns></returns>
-        private List<T> _getRandomList<T>(List<T> inputList)
+        private List<T> GetRandomList<T>(List<T> inputList)
         {
             //赋值数组
             T[] copyArray = new T[inputList.Count];
@@ -679,18 +660,18 @@ namespace Mahjong
         /// <summary>
         /// 玩家对手里的麻将排序
         /// </summary>
-        private void _playerSortCards()
+        private void PlayerSortCards()
         {
             for (int i = 0; i < 4; i++)
             {
-                _sortCards(players[i].myCards);
+                SortCards(players[i].myCards);
             }
         }
 
         /// <summary>
         /// 清除数据
         /// </summary>
-        private void _clearDatas()
+        private void ClearDatas()
         {
             //清除桌数据
             pCard = null;
@@ -704,7 +685,7 @@ namespace Mahjong
             //重置玩家索引
             index = MyUtil.GetRange(0, 4);
             //清除UI
-            _majiangTable.ClearUi();
+            majiangTable.ClearUi();
         }
     }
 }
