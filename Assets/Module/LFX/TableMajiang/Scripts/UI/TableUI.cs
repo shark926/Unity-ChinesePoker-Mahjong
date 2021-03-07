@@ -149,9 +149,9 @@ namespace Mahjong
         }
 
         //出牌
-        private Action<CardType> _playerClickEvent;
+        private Action<CardIndex> _playerClickEvent;
 
-        public void AddPlayerClickEven(Action<CardType> action)
+        public void AddPlayerClickEven(Action<CardIndex> action)
         {
             _playerClickEvent = action;
         }
@@ -162,7 +162,7 @@ namespace Mahjong
         /// 实例化麻将
         /// </summary>
         /// <param name="list"></param>
-        public void InstanceCards(List<CardInfo> list)
+        public void InstanceCards(List<Card> list)
         {
             //根据数据实例化麻将到桌面
 
@@ -173,7 +173,7 @@ namespace Mahjong
                 GameObject o = GameObject.Instantiate(obj, new Vector3(0, 3, 0), Quaternion.identity, transform) as GameObject;
                 MCard c = o.GetComponent<MCard>();
 
-                c.SetCard(list[i].Card);
+                c.SetCardIndex(list[i].CardIndex);
                 list[i].UserData = c;
                 //绑定麻将点击事件
                 c.AddSetSelectEvent(_clickMajiang);
@@ -189,7 +189,7 @@ namespace Mahjong
         /// <returns></returns>
         public void SendMajiangAnimation(List<Player> players)
         {
-            UnitTool.ToolStartCoroutine(_sendMajiangCoroutine(players));
+            UnitTool.ToolStartCoroutine(SendMajiangCoroutine(players));
         }
 
         /// <summary>
@@ -197,12 +197,12 @@ namespace Mahjong
         /// </summary>
         /// <param name="players"></param>
         /// <returns></returns>
-        private IEnumerator _sendMajiangCoroutine(List<Player> players)
+        private IEnumerator SendMajiangCoroutine(List<Player> players)
         {
             List<List<Vector3>> pos = new List<List<Vector3>>();
             for (int i = 0; i < 4; i++)
             {
-                pos.Add(_getMajiangPos(players[i].myCards, i));
+                pos.Add(GetMajiangPos(players[i].myCards, i));
             }
 
             for (int i = 0; i < 13; i++)
@@ -211,8 +211,8 @@ namespace Mahjong
                 {
                     yield return new WaitForSeconds(0.1f);
 
-                    CardInfo cardInfo = players[j].myCards[i];
-                    _majiangAnimation(cardInfo, pos[j][i], j);
+                    Card cardInfo = players[j].myCards[i];
+                    ApplyMajiangPos(cardInfo, pos[j][i], j);
                 }
             }
             yield return new WaitForSeconds(0.5f);
@@ -227,37 +227,36 @@ namespace Mahjong
         /// <summary>
         /// 麻将动画和图片
         /// </summary>
-        /// <param name="mCardInfo"></param>
+        /// <param name="card"></param>
         /// <param name="pos"></param>
         /// <param name="index"></param>
         /// <param name="isSend"></param>
-        private void _majiangAnimation(CardInfo mCardInfo, Vector3 pos, int index)
+        private void ApplyMajiangPos(Card card, Vector3 pos, int index)
         {
-            var card = GetCardObject(mCardInfo);
-            card.transform.localScale = new Vector3(1, 1, 1);
+            var cardObj = GetCardObject(card);
+            cardObj.transform.localScale = new Vector3(1, 1, 1);
 
             if (index == 0)
             {
-                card.SetCardState(CardState.N);
+                cardObj.SetState(CardState.N);
             }
             else if (index == 1)
             {
-                card.SetCardState(CardState.Right);
+                cardObj.SetState(CardState.Right);
             }
             else if (index == 2)
             {
-                card.SetCardState(CardState.Opp);
+                cardObj.SetState(CardState.Opp);
             }
             else if (index == 3)
             {
-                card.SetCardState(CardState.Left);
+                cardObj.SetState(CardState.Left);
             }
-            //card.image.sprite = _initImage(mCardInfo, index);
 
-            card.transform.SetParent(playerTrans[index]);
-            card.transform.SetAsFirstSibling();
+            cardObj.transform.SetParent(playerTrans[index]);
+            cardObj.transform.SetAsFirstSibling();
 
-            _moveMajiang(mCardInfo, pos);
+            cardObj.transform.position = pos;
         }
 
         /// <summary>
@@ -265,7 +264,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="mCardInfo"></param>
         /// <param name="index"></param>
-        public void DrawMajiangAnimation(CardInfo mCardInfo, int index)
+        public void DrawMajiangAnimation(Card mCardInfo, int index)
         {
             Vector3 pos = Vector3.zero;
             if (index == 0)
@@ -285,7 +284,7 @@ namespace Mahjong
                 pos = playerTrans[index].position + new Vector3(-2f, -3.8f, 0);
             }
 
-            _majiangAnimation(mCardInfo, pos + new Vector3(2, 0, 0), index);
+            ApplyMajiangPos(mCardInfo, pos + new Vector3(2, 0, 0), index);
         }
 
         /// <summary>
@@ -294,7 +293,7 @@ namespace Mahjong
         /// <param name="name"></param>
         /// <param name="list"></param>
         /// <param name="index"></param>
-        public void PlayMajiangAnimation(CardInfo cardInfo, List<CardInfo> list, int index)
+        public void PlayMajiangAnimation(Card cardInfo, List<Card> list, int index)
         {
             Vector3 pos = new Vector3();
             if (index == 0)
@@ -320,7 +319,7 @@ namespace Mahjong
             var card = GetCardObject(cardInfo);
                 //if (card.name == name)
                 {
-                    card.SetCardState(CardState.B);
+                    card.SetState(CardState.B);
                     card.transform.position = pos;
                     card.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                     card.transform.SetParent(table);
@@ -335,7 +334,7 @@ namespace Mahjong
         /// <param name="index"></param>
         /// <param name="isSend"></param>
         /// <returns></returns>
-        public void ShowMajiang(List<CardInfo> list, int index)
+        public void ShowMajiang(List<Card> list, int index)
         {
             if (list.Count == 0)
             {
@@ -343,10 +342,10 @@ namespace Mahjong
                 return;
             }
 
-            List<Vector3> pos = _getMajiangPos(list, index);
+            List<Vector3> pos = GetMajiangPos(list, index);
             for (int i = 0; i < list.Count; i++)
             {
-                _majiangAnimation(list[i], pos[i], index);
+                ApplyMajiangPos(list[i], pos[i], index);
             }
         }
 
@@ -355,7 +354,7 @@ namespace Mahjong
         /// </summary>
         /// <param name="list"></param>
         /// <param name="index"></param>
-        public void ShowPengMajiang(List<CardInfo> list, int index)
+        public void ShowPengMajiang(List<Card> list, int index)
         {
             if (index == 0)
                 playerPengPos[0] += new Vector3(2.1f, 0, 0);
@@ -371,10 +370,12 @@ namespace Mahjong
             for (int i = 0; i < list.Count; i++)
             {
                 pos.x += 0.5f;
-                GetCardObject(list[i]).SetCardState(CardState.B);
-                GetCardObject(list[i]).transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-                _moveMajiang(list[i], pos);
-                GetCardObject(list[i]).transform.SetParent(table);
+
+                MCard cardObj = GetCardObject(list[i]);
+                cardObj.SetState(CardState.B);
+                cardObj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+                cardObj.transform.position = pos;
+                cardObj.transform.SetParent(table);
             }
         }
 
@@ -382,7 +383,7 @@ namespace Mahjong
         /// 显示胡牌麻将
         /// </summary>
         /// <param name="list"></param>
-        public void ShowHuMajiang(List<CardInfo> list)
+        public void ShowHuMajiang(List<Card> list)
         {
             //牌的显示位置
             List<Vector3> pos = new List<Vector3>();
@@ -399,7 +400,7 @@ namespace Mahjong
             for (int i = 0; i < pos.Count; i++)
             {
                 var card = GetCardObject(list[i]);
-                card.SetCardState(CardState.B);
+                card.SetState(CardState.B);
                 card.transform.SetParent(table);
                 card.transform.SetAsLastSibling();
                 card.transform.localScale = new Vector3(1, 1, 1);
@@ -407,13 +408,7 @@ namespace Mahjong
             }
         }
 
-        /// <summary>
-        /// 获取麻将的位置
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private List<Vector3> _getMajiangPos(List<CardInfo> list, int type)
+        private List<Vector3> GetMajiangPos(List<Card> list, int type)
         {
             //牌的显示位置
             List<Vector3> pos = new List<Vector3>();
@@ -443,22 +438,11 @@ namespace Mahjong
         }
 
         /// <summary>
-        /// 移动麻将到指定的位置
-        /// </summary>
-        /// <param name="cardInfo"></param>
-        /// <param name="time"></param>
-        private void _moveMajiang(CardInfo mCardInfo, Vector3 endPos)
-        {
-            var tran = GetCardObject(mCardInfo).GetComponent<Transform>();
-            tran.position = endPos;
-        }
-
-        /// <summary>
         /// 根据数据返回卡牌物体
         /// </summary>
         /// <param name="cardInfo"></param>
         /// <returns></returns>
-        public MCard GetCardObject(CardInfo cardInfo)
+        public MCard GetCardObject(Card cardInfo)
         {
             return (MCard)cardInfo.UserData;
         }
@@ -487,7 +471,7 @@ namespace Mahjong
         /// 清除玩家麻将父节点
         /// </summary>
         /// <param name="list"></param>
-        public void ClearPartent(List<CardInfo> list)
+        public void ClearPartent(List<Card> list)
         {
             for (int i = 0; i < list.Count; i++)
             {

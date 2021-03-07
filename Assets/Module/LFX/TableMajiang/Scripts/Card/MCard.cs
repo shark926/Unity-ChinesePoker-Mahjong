@@ -18,9 +18,9 @@ namespace Mahjong
     {
         private Image _image;
 
-        private CardType card;
+        private CardIndex card;
 
-        public CardType Card
+        public CardIndex Card
         {
             get
             {
@@ -28,7 +28,7 @@ namespace Mahjong
             }
         }
 
-        public void SetCard(CardType card)
+        public void SetCardIndex(CardIndex card)
         {
             this.card = card;
             ApplySprite();
@@ -36,7 +36,7 @@ namespace Mahjong
 
         private CardState state;
 
-        public void SetCardState(CardState state)
+        public void SetState(CardState state)
         {
             this.state = state;
 
@@ -98,7 +98,7 @@ namespace Mahjong
             }
         }
 
-        public static MCard Create(CardType card)
+        public static MCard Create(CardIndex card)
         {
             string path = "LFX/TableMajiang/Prefab/Majiang";
 

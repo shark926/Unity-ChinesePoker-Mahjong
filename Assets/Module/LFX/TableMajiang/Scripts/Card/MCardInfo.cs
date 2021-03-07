@@ -3,7 +3,7 @@
     /// <summary>
     /// 卡牌信息
     /// </summary>
-    public enum CardType
+    public enum CardIndex
     {
         None = 0,
 
@@ -52,14 +52,14 @@
         Max
     }
 
-    public class CardInfo
+    public class Card
     {
-        private CardType _cardIndex;
-        public CardType Card
+        private CardIndex cardIndex;
+        public CardIndex CardIndex
         {
             get
             {
-                return _cardIndex;
+                return cardIndex;
             }
         }
 
@@ -68,9 +68,9 @@
             get;set;
         }
 
-        public CardInfo(CardType cardType)
+        public Card(CardIndex cardType)
         {
-            this._cardIndex = cardType;
+            this.cardIndex = cardType;
         }
     }
 }

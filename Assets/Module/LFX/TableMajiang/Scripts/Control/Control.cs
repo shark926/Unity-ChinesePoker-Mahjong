@@ -17,16 +17,16 @@ namespace Mahjong
         private TableUI _majiangTable;
 
         //桌面牌数据
-        private List<CardInfo> tCards = new List<CardInfo>();
+        private List<Card> tCards = new List<Card>();
 
         //玩家出的牌数据
-        private CardInfo pCard;
+        private Card pCard;
 
         //桌面上的玩家
         private List<Player> players = new List<Player>();
 
         //临时麻将
-        private List<CardInfo> temp = new List<CardInfo>();
+        private List<Card> temp = new List<Card>();
 
         //庄家索引
         private int startIndex;
@@ -257,14 +257,14 @@ namespace Mahjong
         /// </summary>
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
-        private void _playerClickMaJiang(CardType card)
+        private void _playerClickMaJiang(CardIndex card)
         {
             if (index % 4 != 0 || isSend || !canClick)
                 return;
 
             foreach (var item in CurPlayerCards)
             {
-                if (item.Card == card)
+                if (item.CardIndex == card)
                 {
                     _playerPlay(item, true);
                     return;
@@ -291,7 +291,7 @@ namespace Mahjong
         /// <param name="cardName"></param>
         /// <param name="go"></param>
         /// <returns></returns>
-        private IEnumerator _waitCoroutine(CardInfo cardInfo, bool go)
+        private IEnumerator _waitCoroutine(Card cardInfo, bool go)
         {
             yield return new WaitForSeconds(1f);
             go = true;
@@ -299,7 +299,7 @@ namespace Mahjong
             _playerPlay(cardInfo, go);
         }
 
-        private List<CardInfo> CurPlayerCards
+        private List<Card> CurPlayerCards
         {
             get
             {
@@ -312,7 +312,7 @@ namespace Mahjong
         /// <param name="cardIndex"></param>
         /// <param name="cardName"></param>
         /// <returns></returns>
-        private void _playerPlay(CardInfo card, bool go)
+        private void _playerPlay(Card card, bool go)
         {
             if (!go)
             {
@@ -321,7 +321,7 @@ namespace Mahjong
             }
 
             //当前玩家的出牌
-            Debug.Log("Player " + index + " 出 " + card.Card);
+            Debug.Log("Player " + index + " 出 " + card.CardIndex);
             int n = 0;
             for (int i = 0; i < CurPlayerCards.Count; i++)
             {
@@ -399,7 +399,7 @@ namespace Mahjong
         /// <returns></returns>
         private bool _checkPengGang()
         {
-            CardType result = CardType.None;
+            CardIndex result = CardIndex.None;
             tempIndex = index;
             //检测其他三个玩家的碰、杠
             for (int i = index + 1; i < index + 4; i++)
@@ -407,17 +407,17 @@ namespace Mahjong
                 if (Rules.IsPeng(players[i % 4].myCards, pCard)
                     || Rules.IsGang(players[i % 4].myCards, pCard))
                 {
-                    result = pCard.Card;
+                    result = pCard.CardIndex;
                 }
 
-                if (result != CardType.None)
+                if (result != CardIndex.None)
                 {
                     index = i % 4;
                     //有玩家碰、杠了
                     temp.Clear();
                     for (int j = 0; j < CurPlayerCards.Count; j++)
                     {
-                        if (CurPlayerCards[j].Card == result)
+                        if (CurPlayerCards[j].CardIndex == result)
                         {
                             temp.Add(CurPlayerCards[j]);
                         }
@@ -458,7 +458,7 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        private void _peng(List<CardInfo> list)
+        private void _peng(List<Card> list)
         {
             Debug.Log("Player " + index.ToString() + " 碰!");
 
@@ -483,7 +483,7 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        private void _gang(List<CardInfo> list)
+        private void _gang(List<Card> list)
         {
             Debug.Log("Player " + index.ToString() + " 杠!");
 
@@ -512,7 +512,7 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="mCardInfo"></param>
         /// <returns></returns>
-        private bool _checkHu(List<CardInfo> list, CardInfo mCardInfo, int win)
+        private bool _checkHu(List<Card> list, Card mCardInfo, int win)
         {
             bool canHu = false;
             if (Rules.IsCanHU(list, mCardInfo))
@@ -602,15 +602,15 @@ namespace Mahjong
         /// </summary>
         private void _initCards()
         {
-            foreach (int item in Enum.GetValues(typeof(CardType)))
+            foreach (int item in Enum.GetValues(typeof(CardIndex)))
             {
-                CardType cardType = (CardType)item;
-                if (cardType > CardType.None
-                    && cardType < CardType.Dong)
+                CardIndex cardType = (CardIndex)item;
+                if (cardType > CardIndex.None
+                    && cardType < CardIndex.Dong)
                 {
                     for (int j = 0; j < 4; j++)
                     {
-                        CardInfo cardInfo = new CardInfo(cardType);
+                        Card cardInfo = new Card(cardType);
                         tCards.Add(cardInfo);
                     }
                 }
@@ -628,20 +628,20 @@ namespace Mahjong
             //}
 
             //洗牌
-            tCards = _getRandomList<CardInfo>(tCards);
+            tCards = _getRandomList<Card>(tCards);
         }
 
         /// <summary>
         /// 排序当前手牌
         /// </summary>
-        private void _sortCards(List<CardInfo> list)
+        private void _sortCards(List<Card> list)
         {
             if (list.Count == 0)
                 return;
 
-            list.Sort(delegate (CardInfo x, CardInfo y)
+            list.Sort(delegate (Card x, Card y)
             {
-                return x.Card.CompareTo(y.Card);
+                return x.CardIndex.CompareTo(y.CardIndex);
             });
         }
 

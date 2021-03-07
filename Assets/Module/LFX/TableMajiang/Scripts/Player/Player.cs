@@ -8,9 +8,9 @@ namespace Mahjong
     public class Player
     {
         //玩家手牌
-        private List<CardInfo> _myCards = new List<CardInfo>();
+        private List<Card> _myCards = new List<Card>();
 
-        public List<CardInfo> myCards
+        public List<Card> myCards
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Mahjong
         /// 添加麻将到玩家的myCards列表中
         /// </summary>
         /// <param name="mCardInfo"></param>
-        public void AddCard(CardInfo mCardInfo)
+        public void AddCard(Card mCardInfo)
         {
             _myCards.Add(mCardInfo);
         }

@@ -7,13 +7,13 @@ namespace Mahjong
     /// </summary>
     public class AI
     {
-        public static CardInfo PlayCard(List<CardInfo> list)
+        public static Card PlayCard(List<Card> list)
         {
             var x = FindDropCard(list);
 
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i].Card == x)
+                if (list[i].CardIndex == x)
                 {
                     return list[i];
                 }
@@ -27,14 +27,14 @@ namespace Mahjong
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private static CardType FindDropCard(List<CardInfo> list)
+        private static CardIndex FindDropCard(List<Card> list)
         {
-            CardType index = CardType.None;
-            List<CardType> cards = new List<CardType>();
+            CardIndex index = CardIndex.None;
+            List<CardIndex> cards = new List<CardIndex>();
 
             for (int i = 0; i < list.Count; i++)
             {
-                cards.Add(list[i].Card);
+                cards.Add(list[i].CardIndex);
             }
 
             if (cards[0] != cards[1] && (cards[0] + 1) != cards[1])

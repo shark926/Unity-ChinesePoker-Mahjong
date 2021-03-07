@@ -13,12 +13,12 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="cardInfo"></param>
         /// <returns></returns>
-        public static bool IsPeng(List<CardInfo> list, CardInfo cardInfo)
+        public static bool IsPeng(List<Card> list, Card cardInfo)
         {
             for (int i = 0; i < list.Count - 1; i++)
             {
-                if (list[i].Card == list[i + 1].Card
-                    && list[i].Card == cardInfo.Card)
+                if (list[i].CardIndex == list[i + 1].CardIndex
+                    && list[i].CardIndex == cardInfo.CardIndex)
                 {
                     return true;
                 }
@@ -33,13 +33,13 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="mCardInfo"></param>
         /// <returns></returns>
-        public static bool IsGang(List<CardInfo> list, CardInfo mCardInfo)
+        public static bool IsGang(List<Card> list, Card mCardInfo)
         {
             for (int i = 0; i < list.Count - 2; i++)
             {
-                if (list[i].Card == list[i + 1].Card
-                    && list[i].Card == mCardInfo.Card
-                    && list[i + 2].Card == list[i + 1].Card)
+                if (list[i].CardIndex == list[i + 1].CardIndex
+                    && list[i].CardIndex == mCardInfo.CardIndex
+                    && list[i + 2].CardIndex == list[i + 1].CardIndex)
                 {
                     return true;
                 }
@@ -54,15 +54,15 @@ namespace Mahjong
         /// <param name="list"></param>
         /// <param name="mCardInfo"></param>
         /// <returns></returns>
-        public static bool IsCanHU(List<CardInfo> list, CardInfo mCardInfo)
+        public static bool IsCanHU(List<Card> list, Card mCardInfo)
         {
-            List<CardType> pais = new List<CardType>();
+            List<CardIndex> pais = new List<CardIndex>();
             for (int i = 0; i < list.Count; i++)
             {
-                pais.Add(list[i].Card);
+                pais.Add(list[i].CardIndex);
             }
             if (mCardInfo != null)
-                pais.Add(mCardInfo.Card);
+                pais.Add(mCardInfo.CardIndex);
 
             //只有两张牌
             if (pais.Count == 2)
@@ -76,8 +76,8 @@ namespace Mahjong
             //依据牌的顺序从左到右依次分出将牌
             for (int i = 0; i < pais.Count; i++)
             {
-                List<CardType> paiT = new List<CardType>(pais);
-                List<CardType> ds = pais.FindAll(delegate (CardType d)
+                List<CardIndex> paiT = new List<CardIndex>(pais);
+                List<CardIndex> ds = pais.FindAll(delegate (CardIndex d)
                 {
                     return pais[i] == d;
                 });
@@ -101,14 +101,14 @@ namespace Mahjong
             return false;
         }
 
-        private static bool HuPaiPanDin(List<CardType> mahs)
+        private static bool HuPaiPanDin(List<CardIndex> mahs)
         {
             if (mahs.Count == 0)
             {
                 return true;
             }
 
-            List<CardType> fs = mahs.FindAll(delegate (CardType a)
+            List<CardIndex> fs = mahs.FindAll(delegate (CardIndex a)
             {
                 return mahs[0] == a;
             });
@@ -139,14 +139,14 @@ namespace Mahjong
         /// <summary>
         /// 排序当前手牌
         /// </summary>
-        private static List<CardInfo> SortCards(List<CardInfo> list)
+        private static List<Card> SortCards(List<Card> list)
         {
             if (list.Count == 0)
                 return null;
 
-            list.Sort(delegate (CardInfo x, CardInfo y)
+            list.Sort(delegate (Card x, Card y)
             {
-                return x.Card.CompareTo(y.Card);
+                return x.CardIndex.CompareTo(y.CardIndex);
             });
 
             return list;
