@@ -26,9 +26,6 @@ namespace Mahjong
         private Button btnPass;
         private Button temp;
 
-        //桌物体
-        private Transform table;
-
         public TableUI() : base(UIType.Normal, UIMode.DoNothing, UICollider.None)
         {
             uiIndex = R.Prefab.MAJIANGTABLE;
@@ -41,7 +38,6 @@ namespace Mahjong
             seats.Add(new SeatOppsite());
             seats.Add(new SeatLeft());
 
-            table = GameObject.Find("Content/Table").transform;
             btnStart = GameObject.Find("Content/Button_start").GetComponent<Button>();
             btnRestart = GameObject.Find("Content/Button_restart").GetComponent<Button>();
             btnSetting = GameObject.Find("Content/Button_tablesetting").GetComponent<Button>();
@@ -250,33 +246,10 @@ namespace Mahjong
             seats[index].Peng(list);
         }
 
-        /// <summary>
-        /// 显示胡牌麻将
-        /// </summary>
-        /// <param name="list"></param>
         public void ShowHuMajiang(List<Card> list)
         {
-            //牌的显示位置
-            List<Vector3> pos = new List<Vector3>();
-            //牌所在的位置
-            Vector3 basePos = Vector3.zero;
-
-            basePos = table.position + new Vector3(list.Count * -0.45f, 0, 0);
-            for (int i = 0; i < list.Count; i++)
-            {
-                basePos.x += 0.8f;
-                pos.Add(basePos);
-            }
-
-            for (int i = 0; i < pos.Count; i++)
-            {
-                var card = GetCardObject(list[i]);
-                card.SetState(CardState.B);
-                card.transform.SetParent(table);
-                card.transform.SetAsLastSibling();
-                card.transform.localScale = new Vector3(1, 1, 1);
-                card.transform.position = pos[i];
-            }
+            // 胡牌暂时都是一样的，随意随便找个seat显示，因为它有table的引用
+            seats[0].ShowHuMajiang(list);
         }
 
         /// <summary>
@@ -294,18 +267,6 @@ namespace Mahjong
         /// </summary>
         public void ClearUi()
         {
-        }
-
-        /// <summary>
-        /// 清除玩家麻将父节点
-        /// </summary>
-        /// <param name="list"></param>
-        public void ClearPartent(List<Card> list)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                GetCardObject(list[i]).transform.SetParent(table);
-            }
         }
 
         /// <summary>

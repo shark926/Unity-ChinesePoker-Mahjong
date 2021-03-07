@@ -56,8 +56,29 @@ namespace Mahjong
         {
         }
 
-        public void Hu(Card card)
+        public void ShowHuMajiang(List<Card> list)
         {
+            //牌的显示位置
+            List<Vector3> pos = new List<Vector3>();
+            //牌所在的位置
+            Vector3 basePos = Vector3.zero;
+
+            basePos = table.position + new Vector3(list.Count * -0.45f, 0, 0);
+            for (int i = 0; i < list.Count; i++)
+            {
+                basePos.x += 0.8f;
+                pos.Add(basePos);
+            }
+
+            for (int i = 0; i < pos.Count; i++)
+            {
+                var card = GetCardObj(list[i]);
+                card.SetState(CardState.B);
+                card.transform.SetParent(table);
+                card.transform.SetAsLastSibling();
+                card.transform.localScale = new Vector3(1, 1, 1);
+                card.transform.position = pos[i];
+            }
         }
 
         protected MCard GetCardObj(Card card)
