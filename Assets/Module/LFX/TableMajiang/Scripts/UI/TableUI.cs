@@ -247,27 +247,7 @@ namespace Mahjong
         /// <param name="index"></param>
         public void ShowPengMajiang(List<Card> list, int index)
         {
-            if (index == 0)
-                playerPengPos[0] += new Vector3(2.1f, 0, 0);
-            if (index == 1)
-                playerPengPos[1] += new Vector3(0, 1f, 0);
-            if (index == 2)
-                playerPengPos[2] += new Vector3(-2.1f, 0, 0);
-            if (index == 3)
-                playerPengPos[3] += new Vector3(0f, -1f, 0);
-
-            Vector3 pos = playerPengPos[index];
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                pos.x += 0.5f;
-
-                MCard cardObj = GetCardObject(list[i]);
-                cardObj.SetState(CardState.B);
-                cardObj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-                cardObj.transform.position = pos;
-                cardObj.transform.SetParent(table);
-            }
+            seats[index].Peng(list);
         }
 
         /// <summary>

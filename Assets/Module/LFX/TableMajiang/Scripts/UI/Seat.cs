@@ -34,7 +34,23 @@ namespace Mahjong
 
         public void Peng(List<Card> list)
         {
+            pengPos += GetPengPosOffset();
+
+            Vector3 pos = pengPos;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                pos.x += 0.5f;
+
+                MCard cardObj = GetCardObj(list[i]);
+                cardObj.SetState(CardState.B);
+                cardObj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+                cardObj.transform.position = pos;
+                cardObj.transform.SetParent(table);
+            }
         }
+
+        protected abstract Vector3 GetPengPosOffset();
 
         public void Gang(List<Card> list)
         {
@@ -64,6 +80,11 @@ namespace Mahjong
         {
             trans = GameObject.Find("Content/Player0").transform;
             pengPos = GameObject.Find("Content/Player0/Peng").transform.position;
+        }
+
+        protected override Vector3 GetPengPosOffset()
+        {
+            return new Vector3(2.1f, 0, 0);
         }
 
         public override void DrawCard(Card card)
@@ -111,6 +132,11 @@ namespace Mahjong
         {
             trans = GameObject.Find("Content/PlayerAI1").transform;
             pengPos = GameObject.Find("Content/PlayerAI1/Peng").transform.position;
+        }
+
+        protected override Vector3 GetPengPosOffset()
+        {
+            return new Vector3(0, 1f, 0);
         }
 
         protected override Vector3 GetDropCard()
@@ -162,6 +188,11 @@ namespace Mahjong
             pengPos = GameObject.Find("Content/PlayerAI2/Peng").transform.position;
         }
 
+        protected override Vector3 GetPengPosOffset()
+        {
+            return new Vector3(-2.1f, 0, 0);
+        }
+
         protected override Vector3 GetDropCard()
         {
             return trans.position + new Vector3(-5.5f, -1.2f, 0);
@@ -208,6 +239,11 @@ namespace Mahjong
         {
             trans = GameObject.Find("Content/PlayerAI3").transform;
             pengPos = GameObject.Find("Content/PlayerAI3/Peng").transform.position;
+        }
+
+        protected override Vector3 GetPengPosOffset()
+        {
+            return new Vector3(0f, -1f, 0);
         }
 
         protected override Vector3 GetDropCard()
